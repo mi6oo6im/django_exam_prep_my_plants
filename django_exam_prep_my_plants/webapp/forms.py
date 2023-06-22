@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from .models import UserProfile
+from .models import UserProfile, Plant
 
 
 # manage profile forms
@@ -24,16 +24,38 @@ class ProfileEdit(BaseProfileForm):
 
 
 # manage plants forms
-class PlantCreate(ModelForm):
+
+class BasePlantsForm(ModelForm):
     class Meta:
-        pass
+        model = Plant
+        fields = '__all__'
+        labels = {
+            'plant_type': 'Plant Type',
+            'plant_name': 'Plant Name',
+            'image_url': 'Image URL',
+        }
 
 
-class PlantEdit(ModelForm):
-    class Meta:
-        pass
+class PlantCreate(BasePlantsForm):
+    pass
 
 
-class PlantDelete(ModelForm):
-    class Meta:
-        pass
+class PlantEdit(BasePlantsForm):
+    pass
+
+
+class PlantDelete(BasePlantsForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__set_disabled_fields()
+
+    def save(self, commit=True):
+        if commit:
+            self.instance.delete()
+
+        return self.instance
+
+    def __set_disabled_fields(self):
+        for field in self.fields.values():
+            field.widget.attrs['disabled'] = 'disabled'
+            field.required = False

@@ -66,16 +66,50 @@ def profile_delete(request):
 
 
 def plant_create(request):
-    pass
+    form = forms.PlantCreate(request.POST or None)
+    if form.is_valid():
+        form.save()
+        return redirect('catalogue')
+
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'webapp/create-plant.html', context)
 
 
 def plant_details(request, pk):
-    pass
+    plant = Plant.objects.get(pk=pk)
+    context = {
+        'plant': plant
+    }
+
+    return render(request, 'webapp/plant-details.html', context)
 
 
 def plant_edit(request, pk):
-    pass
+    current_plant = Plant.objects.get(pk=pk)
+    form = forms.PlantEdit(request.POST or None, instance=current_plant)
+    if form.is_valid():
+        form.save()
+        return redirect('catalogue')
+
+    context = {
+        'form': form,
+        'plant': current_plant,
+    }
+
+    return render(request, 'webapp/edit-plant.html', context)
 
 
 def plant_delete(request, pk):
-    pass
+    plant = Plant.objects.get(pk=pk)
+    form = forms.PlantDelete(request.POST or None, instance=plant)
+    if form.is_valid():
+        form.save()
+        return redirect('catalogue')
+    context = {
+        'form': form,
+        'plant': plant,
+    }
+    return render (request, 'webapp/delete-plant.html', context)
